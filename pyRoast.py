@@ -6,7 +6,7 @@
 
 from pyRoastUI import *
 from PyKDE4.kdeui import KPlotObject
-import time, os, subprocess, signal, select, csv
+import time, os, subprocess, signal, select, csv, serial
 from PyKDE4.kio import KFileDialog
 from PyKDE4.kdecore import KUrl
 from PyQt4.QtGui import QFileDialog
@@ -14,10 +14,10 @@ import getopt, sys, math, re
 
 # a few constants
 gTempArraySize = 5
-gUpdateFrequency = 0.25
+gUpdateFrequency = 1.5#0.25
 gPlotColor = QtGui.QColor(255, 128, 128)
 gProfileColor = QtGui.QColor(10, 50, 255)
-gMaxTime = 30.0
+gMaxTime = 20.0
 gMaxTemp = 300
 gVersion = "0.1"
 rmr = "./RawMeterReader"
@@ -179,8 +179,8 @@ def bSaveAs():
 def bQuit():
     global pcontrol
     # kill off the meter reader child
-    if (not simulate_temp):
-        os.kill(dmm.pid, signal.SIGTERM)
+    # if (not simulate_temp):
+    #     os.kill(dmm.pid, signal.SIGTERM)
     if (pcontrol is not None):
         pcontrol.write("0%\r\n")
         pcontrol.setDTR(0)
@@ -197,116 +197,18 @@ def SetupPlot(plot, dmmPlot, profile):
     plot.addPlotObject(profile)
 
 ###################################
-# get the target temperature
-def GetTarget():
-    if (ui.vTarget.value() != 0):
-        return ui.vTarget.value()
-    return ProfileTemperature()
-
-###################################
-# adjust the amount of power to the heat gun 
-# def PowerControl():
-#     global CurrentTemperature, current_power
-#     global pcontrol
-
-#     current = CurrentTemperature
-#     target = GetTarget()
-#     elapsed = ElapsedTime()/60.0
-#     dt = elapsed - PID_lastt
-#     # don't change the power level more than once every 2 seconds
-
-#     if (dt < 2/60.0):
-#         return
-    
-#     error = target - CurrentTemperature
-#     roc = RateOfChange()
-
-#     power = current_power
-#     # predict the temperature 30 seconds
-#     predict = error - (2*roc)
-#     power = power + (predict/60)
-        
-#     if (power > 100):
-#         power = 100
-#     elif (power < 0):
-#         power = 0
-
-#     if (not ui.cAutoPower.isChecked()):
-#         power = ui.sPowerSlider.value()
-#     if (int(power) != int(current_power)):
-#         AddMessage("power => " + str(int(power)))
-#     if (pcontrol is not None):
-#         spower = power
-#         # there seems to be a bug in the power controller for 100% power
-#         if (spower > 99):
-#             spower = 99
-#         pcontrol.setDTR(1)
-#         pcontrol.write("%u%%\r\n" % int(spower))
-#     current_power = power
-#     ui.tPower.clear()
-#     ui.tPower.setText("%3u%%" % current_power)
-#     ui.sPowerSlider.setValue(current_power)
-
-
-# def PID_PowerControl():
-#     global CurrentTemperature, PID_integral, PID_previous_error, current_power
-#     global PID_lastt, pcontrol
-
-#     current = CurrentTemperature
-#     target = GetTarget()
-#     elapsed = ElapsedTime()/60.0
-#     dt = elapsed - PID_lastt
-#     # don't change the power level more than once every 2 seconds
-
-#     if (dt < 2/60.0):
-#         return
-    
-#     error = target - CurrentTemperature
-#     PID_integral = PID_integral + (error*dt)
-#     derivative = (error - PID_previous_error)/dt
-#     output = (PID_Kp*error) + (PID_Ki*PID_integral) + (PID_Kd*derivative)
-# #    AddMessage("dt=%f Kp_term=%f Ki_term=%f Kd_term=%f" % (dt,PID_Kp*error,PID_Ki*PID_integral,PID_Kd*derivative))
-#     PID_previous_error = error
-#     PID_lastt = elapsed
-
-#     # decay the integral component over 1 minute to 10%
-#     decay = math.exp(dt*math.log(0.1))
-#     PID_integral = PID_integral * decay
-    
-
-#     # map output into power level.
-#     # testing shows that 50% means keep at current temp
-#     power = int(output + current_power)
-#     if (power > 100):
-#         power = 100
-#     elif (power < 0):
-#         power = 0
-
-#     if (ui.cAutoPower.isChecked()):
-#         DebugMessage("current=%f target=%f PID Output %f power=%f" % (current, target, output, power))
-#     else:
-#         power = ui.sPowerSlider.value()
-#     if (power != current_power):
-#         AddMessage("setting power to " + str(power))
-#     if (pcontrol is not None):
-#         spower = power
-#         pcontrol.setDTR(1)
-#         pcontrol.write("%u%%\r\n" % spower)
-#     current_power = power
-#     ui.tPower.clear()
-#     ui.tPower.setText("%3u%%" % current_power)
-#     ui.sPowerSlider.setValue(current_power)
 
 def grabTemperature():
     temp = ''
-    while 1:
-        f1 = open('/dev/ttyUSB0','r')
-        lines = f1.read(55)
-        f1.close()
-        match = re.search('C = [0-9]+.[0-9]+', lines)
-        if match:
-            match2 = re.search('[0-9]+.[0-9]+', match.group())
-            return float(match2.group())
+    ser = serial.Serial('/dev/ttyUSB0')
+    time0 = time.time()
+    if ser.isOpen():
+        while 1:
+            line = ser.readline()
+            match = re.search('[0-9]+.[0-9]+', line)
+            if match:
+#                print time.time() - time0
+                return float(match.group())
 
 ####################
 # called when we get a temp value
@@ -448,16 +350,6 @@ def ChooseDefaultFileName():
        i = i+1
        fname = time.strftime("%Y%m%d") + "-" + str(i) + ".csv";
     ui.tFileName.setText(fname)
-
-############################
-# open a serial port for 
-# power control
-# def PcontrolOpen(file):
-#     s = serial.Serial(file, 9600, parity='N', rtscts=False, 
-#                       xonxoff=False, timeout=1.0)
-#     time.sleep(0.2)
-#     s.setDTR(1)
-#     return s
 
 
 #############################
