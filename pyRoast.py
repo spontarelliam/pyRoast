@@ -14,7 +14,7 @@ import getopt, sys, math, re
 
 # a few constants
 gTempArraySize = 5
-gUpdateFrequency = 1.5#0.25
+gUpdateFrequency = 1.25
 gPlotColor = QtGui.QColor(255, 128, 128)
 gProfileColor = QtGui.QColor(10, 50, 255)
 gMaxTime = 20.0
@@ -129,11 +129,12 @@ def LoadProfile(filename):
     reader = csv.reader(open(filename))
     LoadedProfile.clearPoints()
     for p in reader:
-        if (isNumber(p[0])):
-            label = p[2]
-            if (isNumber(label)):
-                label = ""
-            LoadedProfile.addPoint(float(p[0])/60.0, float(p[1]), label);
+        if p:
+            if (isNumber(p[0])):
+                label = p[2]
+                if (isNumber(label)):
+                    label = ""
+                LoadedProfile.addPoint(float(p[0])/60.0, float(p[1]), label);
     ui.TemperaturePlot.update()
 
 ###########################
@@ -155,8 +156,13 @@ def bSave():
         return
     if (fname.find('.') == -1):
         fname += ".csv";
-    f = open(fname, 'w')
+    f = open('Roasts/'+fname, 'w')
     AddMessage("Saving %u points to \"%s\"" % (len(points), fname))
+    f.write("Coffee:\n")
+    f.write(ui.coffee.text()+'\n')
+    f.write("Notes:\n")
+    f.writelines(ui.notes.toPlainText()+'\n')
+
     f.write("Time,Temperature,Event\n");
     for p in points:
         f.write("%f,%f,\"%s\"\n" % (p.x()*60.0, p.y(), p.label()))
@@ -193,6 +199,7 @@ def SetupPlot(plot, dmmPlot, profile):
     plot.setLimits(0.0, gMaxTime, 0.0, gMaxTemp)
     plot.axis(0).setLabel("Temperature (" + u'\N{DEGREE SIGN}' + "C)")
     plot.axis(1).setLabel("Time (minutes)")
+    plot.axis(2).setLabel("power")
     plot.addPlotObject(dmmPlot)
     plot.addPlotObject(profile)
 
@@ -200,15 +207,18 @@ def SetupPlot(plot, dmmPlot, profile):
 
 def grabTemperature():
     temp = ''
-    ser = serial.Serial('/dev/ttyUSB0')
-    time0 = time.time()
-    if ser.isOpen():
-        while 1:
-            line = ser.readline()
-            match = re.search('[0-9]+.[0-9]+', line)
-            if match:
-#                print time.time() - time0
-                return float(match.group())
+    if os.path.exists('/dev/ttyUSB0'):
+        ser = serial.Serial('/dev/ttyUSB0')
+        time0 = time.time()
+        if ser.isOpen():
+            while 1:
+                line = ser.readline()
+                match = re.search('[0-9]+.[0-9]+', line)
+                if match:
+                    #                print time.time() - time0
+                    return float(match.group())
+    else:
+        return 0.1
 
 ####################
 # called when we get a temp value
@@ -325,8 +335,9 @@ def CheckDMMInput():
     if (simulate_temp):
         SimulateTemperature()
         return
-    
+
     temp = grabTemperature()
+
     GotTemperature(temp)
 
 ############################
@@ -417,7 +428,9 @@ if __name__ == "__main__":
     SetupPlot(ui.TemperaturePlot, dmmPlot, LoadedProfile)
 
     pyRoast.setWindowTitle("pyRoast")
-    
+
+
+
     # connect up the buttons
     QtCore.QObject.connect(ui.bQuit, QtCore.SIGNAL("clicked()"), bQuit)
     QtCore.QObject.connect(ui.bSave, QtCore.SIGNAL("clicked()"), bSave)
