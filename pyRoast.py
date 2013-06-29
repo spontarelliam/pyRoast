@@ -10,7 +10,7 @@ import time, os, subprocess, signal, select, csv, serial
 from PyKDE4.kio import KFileDialog
 from PyKDE4.kdecore import KUrl
 from PyQt4.QtGui import QFileDialog
-import getopt, sys, math, re
+import getopt, sys, math, re, glob
 
 # a few constants
 gTempArraySize = 5
@@ -177,7 +177,7 @@ def bSaveAs():
         filename = str(filename)
         if (os.path.dirname(filename) == os.path.realpath(os.curdir)):
             filename = os.path.basename(filename)
-        ui.tFileName.setText(filename)
+#        ui.tFileName.setText(filename)
         bSave()
 
 ###############
@@ -341,6 +341,19 @@ def CheckDMMInput():
     GotTemperature(temp)
 
 ############################
+# Find all saved roasts and populate them in combobox
+# load notes as well
+def findRoasts():
+    savedRoasts = glob.glob('Roasts/*.csv')
+    for roast in savedRoasts:
+        roast = roast.strip('Roasts/')
+        ui.comboBox.addItem(roast)
+
+
+    return
+
+
+############################
 # called once a second
 def tick():
     global CurrentTemperature
@@ -360,7 +373,7 @@ def ChooseDefaultFileName():
     while (os.path.exists(fname)):
        i = i+1
        fname = time.strftime("%Y%m%d") + "-" + str(i) + ".csv";
-    ui.tFileName.setText(fname)
+#    ui.tFileName.setText(fname)
 
 
 #############################
@@ -429,21 +442,21 @@ if __name__ == "__main__":
 
     pyRoast.setWindowTitle("pyRoast")
 
-
+    findRoasts()
 
     # connect up the buttons
     QtCore.QObject.connect(ui.bQuit, QtCore.SIGNAL("clicked()"), bQuit)
     QtCore.QObject.connect(ui.bSave, QtCore.SIGNAL("clicked()"), bSave)
     QtCore.QObject.connect(ui.bSaveAs, QtCore.SIGNAL("clicked()"), bSaveAs)
     QtCore.QObject.connect(ui.bReset, QtCore.SIGNAL("clicked()"), bReset)
-    QtCore.QObject.connect(ui.bLoadProfile, QtCore.SIGNAL("clicked()"), bLoadProfile)
+#    QtCore.QObject.connect(ui.bLoadProfile, QtCore.SIGNAL("clicked()"), bLoadProfile)
     QtCore.QObject.connect(ui.bFirstCrack, QtCore.SIGNAL("clicked()"), bFirstCrack)
     QtCore.QObject.connect(ui.bRollingFirstCrack,
                            QtCore.SIGNAL("clicked()"), bRollingFirstCrack)
     QtCore.QObject.connect(ui.bSecondCrack, QtCore.SIGNAL("clicked()"), bSecondCrack)
     QtCore.QObject.connect(ui.bRollingSecondCrack,
                            QtCore.SIGNAL("clicked()"), bRollingSecondCrack)
-    QtCore.QObject.connect(ui.bUnload, QtCore.SIGNAL("clicked()"), bUnload)
+#    QtCore.QObject.connect(ui.bUnload, QtCore.SIGNAL("clicked()"), bUnload)
 
     ctimer = QtCore.QTimer()
     QtCore.QObject.connect(ctimer, QtCore.SIGNAL("timeout()"), tick)
@@ -478,6 +491,8 @@ if __name__ == "__main__":
         LoadProfile(profile_file)
 
     AddMessage("Welcome to pyRoast " + gVersion);
+
+
 
     pyRoast.show()
     sys.exit(app.exec_())
