@@ -129,9 +129,38 @@ def ProfileTemperature():
 ###########################
 # load an existing CSV
 # as a profile plot
-def LoadProfile(filename):
-    global LoadedProfile
-    reader = csv.reader(open(filename))
+def LoadProfile():
+#    global LoadedProfile
+
+    filename = ui.tLoadFile.currentText()
+
+    f1 = open('Roasts/'+ui.tLoadFile.currentText(),'r')
+    lines = f1.readlines()
+    f1.close()
+
+    coffee = False
+    notes = False
+    temps = False
+    RoastNotes = ""
+    for line in lines:
+        match1 = re.search("Coffee:",line)
+        match2 = re.search("Notes:",line)
+        match3 = re.search("Time,",line)
+        if match1:
+            coffee = True
+        if match2:
+            line = '\n'+line
+            notes = True
+        if match3:
+            temps = True
+
+        if coffee and not notes:
+            RoastNotes += line
+        if notes and not temps:
+            RoastNotes += line
+    ui.tLoadNotes.setText(RoastNotes)
+
+    reader = csv.reader(open('Roasts/'+filename))
     LoadedProfile.clearPoints()
     for p in reader:
         if p:
@@ -155,7 +184,7 @@ def bLoadProfile():
 # save the data
 def bSave():
     points = dmmPlot.points()
-    fname = str(ui.tFileName.text());
+    fname = str(ui.coffee.text());
     if (fname == ""):
         AddMessage("Please choose a file name")
         return
@@ -220,7 +249,6 @@ def grabTemperature():
                 line = ser.readline()
                 match = re.search('[0-9]+.[0-9]+', line)
                 if match:
-                    #                print time.time() - time0
                     return float(match.group())
     else:
         return 0.1
@@ -351,12 +379,9 @@ def CheckDMMInput():
 def findRoasts():
     savedRoasts = glob.glob('Roasts/*.csv')
     for roast in savedRoasts:
-        roast = roast.strip('Roasts/')
-        ui.comboBox.addItem(roast)
-
-
+        roast = roast.replace('Roasts/', '')
+        ui.tLoadFile.addItem(roast)
     return
-
 
 ############################
 # called once a second
@@ -461,7 +486,7 @@ if __name__ == "__main__":
     QtCore.QObject.connect(ui.bSecondCrack, QtCore.SIGNAL("clicked()"), bSecondCrack)
     QtCore.QObject.connect(ui.bRollingSecondCrack,
                            QtCore.SIGNAL("clicked()"), bRollingSecondCrack)
-#    QtCore.QObject.connect(ui.bUnload, QtCore.SIGNAL("clicked()"), bUnload)
+    QtCore.QObject.connect(ui.tLoadFile, QtCore.SIGNAL("currentIndexChanged(QString)"), LoadProfile)
 
     ctimer = QtCore.QTimer()
     QtCore.QObject.connect(ctimer, QtCore.SIGNAL("timeout()"), tick)

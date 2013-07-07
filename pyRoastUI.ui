@@ -108,7 +108,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="comboBox"/>
+             <widget class="QComboBox" name="tLoadFile">
+              <property name="currentIndex">
+               <number>-1</number>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -120,7 +124,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QTextEdit" name="notes_2">
+           <widget class="QTextEdit" name="tLoadNotes">
             <property name="minimumSize">
              <size>
               <width>200</width>
@@ -536,6 +540,22 @@ CoffeeSnobs!</string>
     <hint type="destinationlabel">
      <x>538</x>
      <y>542</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tLoadFile</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>tLoadNotes</receiver>
+   <slot>update()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>393</x>
+     <y>467</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>358</x>
+     <y>550</y>
     </hint>
    </hints>
   </connection>
