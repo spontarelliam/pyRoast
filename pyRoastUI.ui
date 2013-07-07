@@ -51,33 +51,21 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
             <item>
-             <widget class="KPushButton" name="bSave">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
+             <widget class="QPushButton" name="bSave">
               <property name="text">
                <string>Save</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="KPushButton" name="bSaveAs">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
+             <widget class="QPushButton" name="bSaveAs">
               <property name="text">
                <string>Save As</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="KPushButton" name="bQuit">
+             <widget class="QPushButton" name="bQuit">
               <property name="text">
                <string>Quit</string>
               </property>
@@ -209,7 +197,7 @@
             <property name="maximumSize">
              <size>
               <width>50</width>
-              <height>16777215</height>
+              <height>300</height>
              </size>
             </property>
             <property name="baseSize">
@@ -217,6 +205,9 @@
               <width>0</width>
               <height>0</height>
              </size>
+            </property>
+            <property name="maximum">
+             <number>100</number>
             </property>
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -244,10 +235,17 @@
              </size>
             </property>
             <property name="text">
-             <string>0%</string>
+             <string>0</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>%</string>
             </property>
            </widget>
           </item>
@@ -284,32 +282,7 @@ CoffeeSnobs!</string>
          </widget>
         </item>
         <item>
-         <widget class="KTextBrowser" name="tMessages">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>200</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="baseSize">
-           <size>
-            <width>150</width>
-            <height>0</height>
-           </size>
-          </property>
-         </widget>
+         <widget class="QTextBrowser" name="tMessages"/>
         </item>
        </layout>
       </item>
@@ -382,6 +355,12 @@ CoffeeSnobs!</string>
          <layout class="QHBoxLayout" name="horizontalLayout_17">
           <item>
            <widget class="QLabel" name="label_18">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>30</height>
+             </size>
+            </property>
             <property name="text">
              <string>Elapsed Time:</string>
             </property>
@@ -389,6 +368,12 @@ CoffeeSnobs!</string>
           </item>
           <item>
            <widget class="QLabel" name="tElapsed">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>30</height>
+             </size>
+            </property>
             <property name="text">
              <string/>
             </property>
@@ -400,63 +385,48 @@ CoffeeSnobs!</string>
          </layout>
         </item>
         <item>
-         <widget class="KPushButton" name="bFirstCrack">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-            <horstretch>0</horstretch>
-            <verstretch>1</verstretch>
-           </sizepolicy>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
           </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="bFirstCrack">
           <property name="text">
-           <string>First
-Crack</string>
+           <string>First Crack</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="KPushButton" name="bRollingFirstCrack">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-            <horstretch>0</horstretch>
-            <verstretch>1</verstretch>
-           </sizepolicy>
-          </property>
+         <widget class="QPushButton" name="bRollingFirstCrack">
           <property name="text">
-           <string>Rolling
-First Crack</string>
+           <string>Rolling First Crack</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="KPushButton" name="bSecondCrack">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-            <horstretch>0</horstretch>
-            <verstretch>1</verstretch>
-           </sizepolicy>
-          </property>
+         <widget class="QPushButton" name="bSecondCrack">
           <property name="text">
-           <string>Second
-Crack</string>
+           <string>Second Crack</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="KPushButton" name="bRollingSecondCrack">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-            <horstretch>0</horstretch>
-            <verstretch>1</verstretch>
-           </sizepolicy>
-          </property>
+         <widget class="QPushButton" name="bRollingSecondCrack">
           <property name="text">
-           <string>Rolling
-Second Crack</string>
+           <string>Rolling Second Crack</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="KPushButton" name="bReset">
+         <widget class="QPushButton" name="bReset">
           <property name="text">
            <string>Reset</string>
           </property>
@@ -534,17 +504,40 @@ Second Crack</string>
    <header>kplotwidget.h</header>
    <container>1</container>
   </customwidget>
-  <customwidget>
-   <class>KPushButton</class>
-   <extends>QPushButton</extends>
-   <header>kpushbutton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>KTextBrowser</class>
-   <extends>QTextBrowser</extends>
-   <header>ktextbrowser.h</header>
-  </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>sPowerSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>tPower</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>504</x>
+     <y>542</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>571</x>
+     <y>542</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>vTarget</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>tPower</receiver>
+   <slot>setNum(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>571</x>
+     <y>471</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>538</x>
+     <y>542</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
