@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'pyRoastUI.ui'
 #
-# Created: Sun Jul  7 16:03:10 2013
+# Created: Sun Jul  7 19:41:12 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -82,17 +82,17 @@ class Ui_pyRoast(object):
         self.label_2.setFont(font)
         self.label_2.setObjectName(_fromUtf8("label_2"))
         self.horizontalLayout_4.addWidget(self.label_2)
-        self.comboBox = QtGui.QComboBox(self.centralwidget)
-        self.comboBox.setObjectName(_fromUtf8("comboBox"))
-        self.horizontalLayout_4.addWidget(self.comboBox)
+        self.tLoadFile = QtGui.QComboBox(self.centralwidget)
+        self.tLoadFile.setObjectName(_fromUtf8("tLoadFile"))
+        self.horizontalLayout_4.addWidget(self.tLoadFile)
         self.verticalLayout_3.addLayout(self.horizontalLayout_4)
         self.label_10 = QtGui.QLabel(self.centralwidget)
         self.label_10.setObjectName(_fromUtf8("label_10"))
         self.verticalLayout_3.addWidget(self.label_10)
-        self.notes_2 = QtGui.QTextEdit(self.centralwidget)
-        self.notes_2.setMinimumSize(QtCore.QSize(200, 0))
-        self.notes_2.setObjectName(_fromUtf8("notes_2"))
-        self.verticalLayout_3.addWidget(self.notes_2)
+        self.tLoadNotes = QtGui.QTextEdit(self.centralwidget)
+        self.tLoadNotes.setMinimumSize(QtCore.QSize(200, 0))
+        self.tLoadNotes.setObjectName(_fromUtf8("tLoadNotes"))
+        self.verticalLayout_3.addWidget(self.tLoadNotes)
         self.horizontalLayout_8.addLayout(self.verticalLayout_3)
         self.gridLayout.addLayout(self.horizontalLayout_8, 1, 0, 1, 1)
         self.verticalLayout_2 = QtGui.QVBoxLayout()
@@ -251,8 +251,10 @@ class Ui_pyRoast(object):
         pyRoast.setStatusBar(self.statusbar)
 
         self.retranslateUi(pyRoast)
+        self.tLoadFile.setCurrentIndex(-1)
         QtCore.QObject.connect(self.sPowerSlider, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), self.tPower.setNum)
         QtCore.QObject.connect(self.vTarget, QtCore.SIGNAL(_fromUtf8("valueChanged(double)")), self.tPower.setNum)
+        QtCore.QObject.connect(self.tLoadFile, QtCore.SIGNAL(_fromUtf8("currentIndexChanged(QString)")), self.tLoadNotes.update)
         QtCore.QMetaObject.connectSlotsByName(pyRoast)
 
     def retranslateUi(self, pyRoast):
