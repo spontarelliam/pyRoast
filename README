@@ -1,0 +1,2 @@
+Build the GUI using:
+pyuic4 pyRoastUI.ui -o pyRoastUI.py

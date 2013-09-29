@@ -369,7 +369,11 @@ def CheckDMMInput():
         SimulateTemperature()
         return
 
-    temp = grabTemperature()
+#    temp = grabTemperature()
+    temp = 12
+#    print ui.sPowerSlider.value()
+    ser = serial.Serial('/dev/ttyUSB0')
+    ser.write('n'+str(ui.sPowerSlider.value()))
 
     GotTemperature(temp)
 
