@@ -122,33 +122,3 @@ void loop(){ // sample code to exercise the circuit
  
    delay(1000);
 }
-
-
-
-
-  
-void setup() {
-  Serial.begin(9600);
-  
-  Serial.println("MAX31855 test");
-  // wait for MAX chip to stabilize
-  delay(500);
-}
-
-void loop() {
-  // basic readout test, just print the current temp
-   Serial.print("Internal Temp = ");
-   Serial.println(thermocouple.readInternal());
-
-   double c = thermocouple.readCelsius();
-   if (isnan(c)) {
-     Serial.println("Something wrong with thermocouple!");
-   } else {
-     Serial.print("C = "); 
-     Serial.println(c);
-   }
-   //Serial.print("F = ");
-   //Serial.println(thermocouple.readFarenheit());
- 
-   delay(1000);
-}
