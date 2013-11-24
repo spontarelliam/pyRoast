@@ -23,7 +23,7 @@ gUpdateFrequency = 1.25
 gPlotColor = QtGui.QColor(255, 128, 128)
 gProfileColor = QtGui.QColor(10, 50, 255)
 gMaxTime = 20.0
-gMaxTemp = 300
+gMaxTemp = 400
 gVersion = "0.1"
 rmr = "./RawMeterReader"
 simulate_temp = False
@@ -231,7 +231,7 @@ def bQuit():
 # parameters
 def SetupPlot(plot, dmmPlot, profile):
     plot.setLimits(0.0, gMaxTime, 0.0, gMaxTemp)
-    plot.axis(0).setLabel("Temperature (" + u'\N{DEGREE SIGN}' + "C)")
+    plot.axis(0).setLabel("Temperature (" + u'\N{DEGREE SIGN}' + "F)")
     plot.axis(1).setLabel("Time (minutes)")
     plot.axis(2).setLabel("power")
     plot.addPlotObject(dmmPlot)
@@ -247,9 +247,11 @@ def grabTemperature():
         if ser.isOpen():
             while 1:
                 line = ser.readline()
-                match = re.search('[0-9]+.[0-9]+', line)
-                if match:
-                    return float(match.group())
+                match1 = re.search('F =', line)
+                if match1:
+                    match = re.search('[0-9]+.[0-9]+', line)
+                    if match:
+                        return float(match.group())
     else:
         return 0.1
 
@@ -369,8 +371,8 @@ def CheckDMMInput():
         SimulateTemperature()
         return
 
-#    temp = grabTemperature()
-    temp = 12
+    temp = grabTemperature()
+#    temp = 12
 #    print ui.sPowerSlider.value()
     ser = serial.Serial('/dev/ttyUSB0')
     ser.write('n'+str(ui.sPowerSlider.value()))

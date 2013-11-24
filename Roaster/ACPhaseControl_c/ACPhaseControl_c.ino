@@ -39,9 +39,9 @@ int thermoCS = 4;
 int thermoCLK = 5;
 Adafruit_MAX31855 thermocouple(thermoCLK, thermoCS, thermoDO);
 
-int power=0;
+int power=40;
 float t3=1.0/120.0; //0.00833 sec per half wave
-float resolution=1.6*pow(10,-5); //timer resolution with divide by 256
+float resolution=5*pow(10,-7); //timer resolution with divide by 8
 
 void setup(){
   Serial.begin(9600);
@@ -50,42 +50,61 @@ void setup(){
   pinMode(DETECT, INPUT);     //zero cross detect
   digitalWrite(DETECT, HIGH); //enable pull-up resistor
   pinMode(GATE, OUTPUT);      //triac gate control
+  
+  // initialize Timer1
+  cli();			// disable global interrupts
+  TCCR1A = 0;		// set entire TCCR1A register to 0
+  TCCR1B = 0;		// same for TCCR1B
 
   // set up Timer1 
   //(see ATMEGA 328 data sheet pg 134 for more details)
-  OCR1A = 519;      //initialize the comparator
-  TIMSK1 = 0x03;    //enable comparator A and overflow interrupts
-  TCCR1A = 0x00;    //timer control registers set for
-  TCCR1B = 0x00;    //normal operation, timer disabled
+  OCR1A = 16660 / 2;      //initialize the comparator
+  // turn on CTC mode:
+  TCCR1B |= (1 << WGM12);
+  TIMSK1 |= (1 << OCIE1A); // enable compare interrupt
+  TIMSK1 |= (1 << TOIE1); // enable overflow interrupt
+  TCCR1B |= (1 << CS11); // divide by 8
+  
+  sei();			// enable global interrupts
 
   // set up zero crossing interrupt
-  attachInterrupt(0,zeroCrossingInterrupt, RISING);    
+  attachInterrupt(0,zeroCrossingInterrupt, CHANGE);    
     //IRQ0 is pin 2. Call zeroCrossingInterrupt 
     //on rising signal
-
 }  
 
 //Interrupt Service Routines
 
-void zeroCrossingInterrupt(){ //zero cross detect   
-  TCCR1B=0x04; //start timer with divide by 256 input
+void zeroCrossingInterrupt(){ //zero cross detect 
+//  Serial.print("zerocross, ");
+//  Serial.println(millis());
+  //TCCR1B=0x04; //start timer with divide by 256 input
+  
   TCNT1 = 0;   //reset timer - count from zero
 }
 
 ISR(TIMER1_COMPA_vect){ //comparator match
+//  Serial.print("match, ");
+//  Serial.println(millis());
   digitalWrite(GATE,HIGH);  //set triac gate to high
-  TCNT1 = 65536-PULSE;      //trigger pulse width
+  // Set the timer to 4 less than the overflow value so that it overflows in the next 4 counts and turns off
+  TCNT1 = 65535-PULSE;      //trigger pulse width
 }
 
 ISR(TIMER1_OVF_vect){ //timer1 overflow
+ // Serial.print("overflow, ");
+//  Serial.println(millis());
   digitalWrite(GATE,LOW); //turn off triac gate
-  TCCR1B = 0x00;          //disable timer stopd unintended triggers
+//  TCCR1B = 0x00;          //disable timer stopd unintended triggers
 }
 
-void loop(){ // sample code to exercise the circuit
+void loop(){ // sample code to exercise the circuit 
+    Serial.print(power);
+    Serial.print(" ");
+    Serial.println(OCR1A);
   if (power >= 100)
   {
-    OCR1A = 0;
+    OCR1A = 1;
   }
   else
   {
@@ -94,7 +113,8 @@ void loop(){ // sample code to exercise the circuit
   
   if (Serial.available())
   {
-    if (Serial.peek() == 'power')
+    //if (Serial.peek() == 'power')
+    if (Serial.peek() == 'n')
     {
       Serial.read();
       power = Serial.parseInt();
@@ -107,18 +127,18 @@ void loop(){ // sample code to exercise the circuit
 
   // Thermocouple Code
   // basic readout test, just print the current temp
-   Serial.print("Internal Temp = ");
-   Serial.println(thermocouple.readInternal());
+   //Serial.print("Internal Temp = ");
+   //Serial.println(thermocouple.readInternal());
 
-   double c = thermocouple.readCelsius();
+/*   double c = thermocouple.readCelsius();
    if (isnan(c)) {
      Serial.println("Something wrong with thermocouple!");
    } else {
      Serial.print("C = "); 
      Serial.println(c);
-   }
-   //Serial.print("F = ");
-   //Serial.println(thermocouple.readFarenheit());
+   }*/
+   Serial.print("F = ");
+   Serial.println(thermocouple.readFarenheit());
  
    delay(1000);
 }
